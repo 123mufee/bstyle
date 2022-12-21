@@ -300,6 +300,10 @@ router.post("/profile/:id", async (req, res, next) => {
     next(error);
   }
 });
+router.get('/forgotpassword', userHelper.forgotpassword);
+router.post('/resetpassword', userHelper.resetpassword);
+router.post('/verifypasswordotp', userHelper.verifypasswordotp);
+router.post('/setnewpassword', userHelper.settingpassword);
 
 //cart
 router.get("/cart", middleware.userAuth, async (req, res, next) => {

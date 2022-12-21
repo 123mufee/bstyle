@@ -93,6 +93,79 @@ module.exports = {
   //     })
       
   // },
+
+  //forgot password start
+  forgotpassword: (req, res) => {
+    console.log('got forgot password');
+    res.render('user/forgotpassword');  //registered mail page
+},
+
+resetpassword: async (req, res) => {
+    console.log('entered resetpassword');
+    const userEmail = req.body;
+    req.session.email = userEmail;
+    console.log(userEmail);
+    console.log('got user email');
+    // const user = await UserModel.findOne({ $and: [{ email: userEmail.email }, { status: "Unblocked" }] });
+    const user = await db
+    .get()
+    .collection(collection.USER_COLLECTION)
+    .findOne({ email: userEmail.email, blockUsers: false });
+    console.log('found user');
+    if (!user) {
+        return res.redirect('/signin');
+    } else {
+      let otp=Math.random()
+      otp=otp*1000000
+      otp=parseInt(otp)
+      console.log(otp);
+      res.render('user/newpassword')
+
+    }
+},
+
+verifypasswordotp: (req, res) => {
+    console.log('setting new password');
+    if (req.body.otp == otp) {
+        console.log('correct otp');
+        res.render('user/newpassword');
+    } else {
+        console.log('incorrect otp');
+        res.render('user/passwordotp');
+    }
+    // res.render('user/newpassword');
+},
+
+settingpassword: async (req, res) => {
+    Pass1 = req.body.password1;
+    Pass2 = req.body.password2;
+    console.log(Pass1);
+    console.log(Pass2);
+    if (Pass1 === Pass2) {
+
+        pass = await bcrypt.hash(Pass2, 10)
+        console.log('password :' + pass);
+
+        console.log('checked password');
+        console.log(req.session.email);
+        existUser = req.session.email;
+        const updateUser = await db
+        .get()
+        .collection(collection.USER_COLLECTION)
+        .updateOne({ email: existUser.email }, { $set: { password: pass } });
+        console.log(updateUser);
+        res.redirect('/login');
+
+    } else {
+        console.log('incorrect pass');
+        res.render('user/newpassword');
+    }
+    // console.log('redirect to signin page');
+
+},
+//forgot password end
+
+
   userprofile:(useremail,userbody)=>{
     console.log("bbbb")
     return new Promise(async(resolve,reject)=>{
@@ -642,6 +715,7 @@ module.exports = {
     let proObj = {
       item: objectId(proId),
       quantity: 1,
+      // active:true
     };
     return new Promise(async (resolve, reject) => {
       try {
