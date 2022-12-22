@@ -232,10 +232,10 @@ router.get("/view-product", async function (req, res, next) {
 router.get("/profile/:id",middleware.userAuth, async (req, res, next) => {
   try {
     const userData = await userHelper.getUserDetails(req.params.id);
-    // const photo = await userHelper.imageupload(req.session.user._id)
-    // console.log(photo);
+    const photo = await userHelper.imageupload(req.session.user._id)
+    console.log(photo);
     res.render("user/profile", { userData, user: true, 
-      // photo 
+      photo 
     });
   } catch (error) {
     next(error);
@@ -299,7 +299,7 @@ router.post("/profile/:id", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-});
+}); 
 router.get('/forgotpassword', userHelper.forgotpassword);
 router.post('/resetpassword', userHelper.resetpassword);
 router.post('/verifypasswordotp', userHelper.verifypasswordotp);
