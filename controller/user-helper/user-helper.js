@@ -715,7 +715,7 @@ settingpassword: async (req, res) => {
     let proObj = {
       item: objectId(proId),
       quantity: 1,
-      // active:true
+      active:true
     };
     return new Promise(async (resolve, reject) => {
       try {
