@@ -768,8 +768,8 @@ settingpassword: async (req, res) => {
       product,
       user: true,
       userData,
-      // cartCount,
-      // wishCount,
+      cartCount,
+      wishCount,
     });
   })    
 
