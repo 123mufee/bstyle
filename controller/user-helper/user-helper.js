@@ -1,6 +1,7 @@
 const db = require("../../config/connection");
 const collection = require("../../config/collection");
 const bcrypt = require("bcrypt");
+const nodemailer=require("nodemailer");
 const { response } = require("../../app");
 const { PRODUCT_COLLECTION } = require("../../config/collection");
 const objectId = require("mongodb").ObjectId;
