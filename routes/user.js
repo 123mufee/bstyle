@@ -205,15 +205,16 @@ router.get("/view-product", async function (req, res, next) {
   try {
     let userData = req.session.user;
     let cartCount = null;
-    if (req.session.user) {
+  
+    productHelper.getAllProduct().then(async(product) => {
+      console.log(product); 
+       if (req.session.user) {
       cartCount = await userHelper.getCartCount(req.session.user._id);
     }
     let wishCount = null;
     if (req.session.user) {
       wishCount = await userHelper.getWishCount(req.session.user._id);
     }
-    productHelper.getAllProduct().then((product) => {
-      console.log(product);
       console.log("lloll");
       res.render("user/view-product", {
         product,

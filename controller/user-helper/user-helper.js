@@ -12,6 +12,26 @@ var instance = new Razorpay({
   key_id: "rzp_test_2QPRJfwv1TIYjS",
   key_secret: "ibu7PoN3iGLy3zGCa3RDWOXC",
 });
+const nodemailer = require("nodemailer")
+
+let transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  service: 'Gmail',
+
+  auth: {
+    user: 'Bstylewebsite@gmail.com',
+    pass: 'steubbsjvxvauumn',
+  }
+
+});
+let otp=Math.random()
+otp=otp*1000000
+otp=parseInt(otp)
+console.log(otp);
+
+
 
 module.exports = {
   doSignup: (userData) => {
@@ -102,7 +122,7 @@ module.exports = {
 
 resetpassword: async (req, res) => {
     console.log('entered resetpassword');
-    const userEmail = req.body;
+    const userEmail = req.body.email;
     req.session.email = userEmail;
     console.log(userEmail);
     console.log('got user email');
@@ -110,16 +130,31 @@ resetpassword: async (req, res) => {
     const user = await db
     .get()
     .collection(collection.USER_COLLECTION)
-    .findOne({ email: userEmail.email, blockUsers: false });
+    .findOne({ email: userEmail, blockUsers: false });
     console.log('found user');
     if (!user) {
         return res.redirect('/signin');
     } else {
-      let otp=Math.random()
-      otp=otp*1000000
-      otp=parseInt(otp)
-      console.log(otp);
-      res.render('user/newpassword')
+      let testMail=userEmail
+      console.log(testMail);
+
+      var mailOptions = {
+        to:testMail,
+        subject: "Forgot Password OTP ",
+        html: "<h3>OTP for account verification is </h3>" + "<h1 style='font-weight:bold;'>" + otp + "</h1>" // html body
+      };
+
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          return console.log(error);
+        }
+        console.log('Message sent: %s', info.messageId);
+        console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+
+        res.render('user/otp');
+      });
+
+      res.render('user/passwordotp')
 
     }
 },
@@ -721,11 +756,11 @@ settingpassword: async (req, res) => {
     let userData = req.session.user;
     let cartCount = null;
     if (req.session.user) {
-      cartCount = await this.getCartCount(req.session.user._id);
+      cartCount = await module.exportsgetCartCount(req.session.user._id);
     } 
     let wishCount = null;
     if (req.session.user) {
-      wishCount = await this.getWishCount(req.session.user._id);
+      wishCount = await getWishCount(req.session.user._id);
     }
     let product=pro
     console.log(product);
@@ -733,8 +768,8 @@ settingpassword: async (req, res) => {
       product,
       user: true,
       userData,
-      cartCount,
-      wishCount,
+      // cartCount,
+      // wishCount,
     });
   })    
 
