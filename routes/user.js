@@ -228,6 +228,7 @@ router.get("/view-product", async function (req, res, next) {
   }
 });
 
+
 //user profile
 router.get("/profile/:id",middleware.userAuth, async (req, res, next) => {
   try {
@@ -291,6 +292,7 @@ userHelper.pictureupload(req.files,req.session.user._id).then(async()=>{
 
  
 })
+router.post('/search',userHelper.searchItems);
 
 router.post("/profile/:id", async (req, res, next) => {
   try {

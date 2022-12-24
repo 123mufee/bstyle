@@ -135,6 +135,17 @@
 						{{/if}}
 
 					</div>
+					<form action="/search" method="post" >
+					<div class="input-group rounded">
+						
+						<input name="search" type="search" class="form-control rounded" placeholder="Search" aria-label="Search"
+							aria-describedby="search-addon" />
+						{{!-- <span class="input-group-text border-0" id="search-addon">
+							<i class="fas fa-search"></i>
+						</span> --}}
+						<button class="btn btn-success" type="submit">search</button>
+					</div>
+					</form>
 				</nav>
 			</div>
 		</div>
@@ -603,15 +614,26 @@
 					<div class="block2">
 						<div class="block2-pic hov-img0">
 							<a href="/productpage/{{this._id}}">
-								<img src="../../public/product-images/{{this.image}}"style="width:350px;height:450px;margin-left:30px;border-radius 20px; ;" alt="IMG-PRODUCT"></a>
+								<img src="../../public/product-images/{{this.image}}"
+									style="width:350px;height:450px;margin-left:30px;border-radius 20px; ;"
+									alt="IMG-PRODUCT"></a>
 							<div class="d-flex">
-								{{!-- {{#if }} --}}
+							
 								<img onclick="addToWishlist('{{this._id}}')"
-											src="/public/product-images/heart.svg" alt="" style="margin-left:155px;margin-top:30px;cursor: pointer;"
-											width="30px" height="25px" />
-								{{!-- <li>  --}}
-										<img onclick="addToCart('{{this._id}}')" src="/public/product-images/cart.svg" alt="" style="margin-right:110px;margin-top:30px;cursor: pointer;"
-											class="first" width="30px" height=" 25px" />
+									src="https://2.bp.blogspot.com/-CZ6preo9Hfc/Vjk6aMS2GmI/AAAAAAAABO0/7WJa54trZCI/s1600/heart.png"
+									alt="" style="margin-left:155px;margin-top:30px;cursor: pointer;" width="30px"
+									height="25px" />
+
+								
+
+								<img onclick="addToWishlist('{{this._id}}')" src="/public/product-images/heart.svg"
+									alt="" style="margin-left:155px;margin-top:30px;cursor: pointer;" width="30px"
+									height="25px" />
+							
+								{{!-- <li> --}}
+									<img onclick="addToCart('{{this._id}}')" src="/public/product-images/cart.svg"
+										alt="" style="margin-right:110px;margin-top:30px;cursor: pointer;" class="first"
+										width="30px" height=" 25px" />
 
 							</div>
 
@@ -623,7 +645,8 @@
 
 						<div class="block2-txt flex-w flex-t p-t-14">
 							<div class="block2-txt-child1 flex-col-l ">
-								<a href="product-detail.html" class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6" style="margin-left: 70px;margin-top: -40px;">
+								<a href="product-detail.html" class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6"
+									style="margin-left: 70px;margin-top: -40px;">
 									{{this.product}}
 								</a>
 
@@ -1645,7 +1668,7 @@
 
 	<script>
 		function addToCart(proId) {
-			
+
 			$.ajax({
 				url: '/add-to-cart/' + proId,
 				method: 'get',
@@ -1663,17 +1686,17 @@
 					}
 
 				}
-			}) 
+			})
 
 		}
 
 		function addToWishlist(proId) {
-		
+
 			$.ajax({
 				url: '/add-to-wishlist/' + proId,
 				method: 'get',
 				success: (response) => {
-					
+
 					if (response.status) {
 						let count = $('#wish-count').html()
 						swal({
@@ -1684,15 +1707,15 @@
 						});
 						count = parseInt(count) + 1
 						$("#wish-count").html(count)
-					}else if(response.exists){
-						
+					} else if (response.exists) {
+
 						swal({
 							title: "Good job!",
 							text: "This product added to your wishlist",
 							icon: "success",
 							button: "Ok",
 						});
-						
+
 					}
 
 				}

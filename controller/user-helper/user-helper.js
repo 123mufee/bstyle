@@ -709,13 +709,43 @@ settingpassword: async (req, res) => {
      }
     });
   },
+  searchItems:(req,res)=>{
+  return new Promise(async(resolve,reject)=>{
+    let  searchword=req.body.search
+    let searchproducts=await db
+    .get()
+    .collection(collection.PRODUCT_COLLECTION)
+    .find({product:{$regex:searchword,'$options':'i'}}).toArray()
+    resolve(searchproducts)
+  }).then(async(pro)=>{
+    let userData = req.session.user;
+    let cartCount = null;
+    if (req.session.user) {
+      cartCount = await this.getCartCount(req.session.user._id);
+    } 
+    let wishCount = null;
+    if (req.session.user) {
+      wishCount = await this.getWishCount(req.session.user._id);
+    }
+    let product=pro
+    console.log(product);
+    res.render("user/view-product", {
+      product,
+      user: true,
+      userData,
+      cartCount,
+      wishCount,
+    });
+  })    
+
+  },
   
   
   addToWishlist: (proId, userId) => {
     let proObj = {
       item: objectId(proId),
       quantity: 1,
-      active:true
+      flag: false
     };
     return new Promise(async (resolve, reject) => {
       try {

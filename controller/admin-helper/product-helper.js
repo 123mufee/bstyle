@@ -4,36 +4,36 @@ const objectId = require("mongodb").ObjectId;
 
 module.exports = {
   addProduct: (product) => {
-    product.price=parseInt(product.price)
+    product.price = parseInt(product.price)
     return new Promise(async (resolve, reject) => {
-      
-     try {
-       await db
-         .get()
-         .collection("product")
-         .insertOne(product)
-         .then((data) => {
-           resolve(data);
-         });
-     } catch (error) {
-      reject(error);
-     }
+
+      try {
+        await db
+          .get()
+          .collection("product")
+          .insertOne(product)
+          .then((data) => {
+            resolve(data);
+          });
+      } catch (error) {
+        reject(error);
+      }
     });
   },
   getAllProduct: () => {
     return new Promise(async (resolve, reject) => {
-     try {
-       const products = await db
-         .get()
-         .collection(collection.PRODUCT_COLLECTION)
-         .find()
-         .sort({ _id: -1 })
-         .sort({price:-1})
-         .toArray();
-       resolve(products);
-     } catch (error) {
-      reject(error);
-     }
+      try {
+        const products = await db
+          .get()
+          .collection(collection.PRODUCT_COLLECTION)
+          .find()
+          .sort({ _id: -1 })
+          .sort({ price: -1 })
+          .toArray();
+        resolve(products);
+      } catch (error) {
+        reject(error);
+      }
     });
   },
   getProductDetails: (proId) => {
@@ -52,7 +52,7 @@ module.exports = {
   },
 
   updateProduct: (proId, proDetails) => {
-    proDetails.price=parseInt(proDetails.price)
+    proDetails.price = parseInt(proDetails.price)
     return new Promise((resolve, reject) => {
       try {
         db.get()
@@ -80,16 +80,16 @@ module.exports = {
 
   deleteproduct: (proId) => {
     return new Promise((resolve, reject) => {
-     try {
-       db.get()
-         .collection(collection.PRODUCT_COLLECTION)
-         .deleteOne({ _id: objectId(proId) })
-         .then((response) => {
-           resolve(response);
-         });
-     } catch (error) {
-      reject(error);
-     }
+      try {
+        db.get()
+          .collection(collection.PRODUCT_COLLECTION)
+          .deleteOne({ _id: objectId(proId) })
+          .then((response) => {
+            resolve(response);
+          });
+      } catch (error) {
+        reject(error);
+      }
     });
   },
 };
