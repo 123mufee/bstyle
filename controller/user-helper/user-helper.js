@@ -756,11 +756,11 @@ settingpassword: async (req, res) => {
     let userData = req.session.user;
     let cartCount = null;
     if (req.session.user) {
-      cartCount = await module.exportsgetCartCount(req.session.user._id);
+      cartCount = await module.exports.getCartCount(req.session.user._id);
     } 
     let wishCount = null;
     if (req.session.user) {
-      wishCount = await getWishCount(req.session.user._id);
+      wishCount = await module.exports.getWishCount(req.session.user._id);
     }
     let product=pro
     console.log(product);
