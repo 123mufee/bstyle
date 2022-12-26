@@ -229,7 +229,63 @@ router.get("/view-product", async function (req, res, next) {
   }
 });
 
+router.get("/user/sortD", async function (req, res, next) {
+  console.log('ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp');
+  try {
+    let userData = req.session.user;
+    let cartCount = null;
+  
+    userHelper.sortD().then(async(product) => {
+      console.log(product); 
+       if (req.session.user) {
+      cartCount = await userHelper.getCartCount(req.session.user._id);
+    }
+    let wishCount = null;
+    if (req.session.user) {
+      wishCount = await userHelper.getWishCount(req.session.user._id);
+    }
+      console.log("lloll");
+      res.render("user/sortD", {
+        product,
+        user: true,
+        userData,
+        cartCount,
+        wishCount,
+      });
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
+router.get("/user/sortA", async function (req, res, next) {
+  console.log('ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp');
+  try {
+    let userData = req.session.user;
+    let cartCount = null;
+  
+    userHelper.sortA().then(async(product) => {
+      console.log(product); 
+       if (req.session.user) {
+      cartCount = await userHelper.getCartCount(req.session.user._id);
+    }
+    let wishCount = null;
+    if (req.session.user) {
+      wishCount = await userHelper.getWishCount(req.session.user._id);
+    }
+      console.log("lloll");
+      res.render("user/sortA", {
+        product,
+        user: true,
+        userData,
+        cartCount,
+        wishCount,
+      });
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 //user profile
 router.get("/profile/:id",middleware.userAuth, async (req, res, next) => {
   try {

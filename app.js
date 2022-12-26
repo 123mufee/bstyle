@@ -49,6 +49,16 @@ app.use(fileUpload());
 app.use("/", userRouter);
 app.use("/admin", adminRouter);
 
+//pagination
+app.get("/view-product",async(req,res)=>{
+  const {page,limit,sort,asc}=req.query;
+  let skip=(page-1)*10;
+  if (!page)page=1;
+  if(!limit)limit=10;
+const user=await user.find().sort({[sort]:1}).skip(skip).limit(limit);
+res.send({page:page,limit:limit,user:user});
+})
+
 
 
 // error handler

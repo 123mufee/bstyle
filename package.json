@@ -16,6 +16,7 @@
     "express-session": "^1.17.3",
     "hbs": "^4.2.0",
     "http-errors": "~1.6.3",
+    "ideas": "^0.0.1",
     "moment": "^2.29.4",
     "mongo": "^0.1.0",
     "mongodb": "^4.7.0",

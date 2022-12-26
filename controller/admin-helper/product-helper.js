@@ -27,8 +27,8 @@ module.exports = {
           .get()
           .collection(collection.PRODUCT_COLLECTION)
           .find()
-          .sort({ _id: -1 })
-          .sort({ price: -1 })
+          // .sort({ _id: -1 })
+          // .sort({ price: -1 })
           .toArray();
         resolve(products);
       } catch (error) {

@@ -1050,6 +1050,43 @@ settingpassword: async (req, res) => {
       }
     });
   },
+
+  sortD: () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const products = await db
+          .get()
+          .collection(collection.PRODUCT_COLLECTION)
+          .find()
+          .sort({ _id: -1 })
+          .sort({ price: -1 })
+          .toArray();
+        resolve(products);
+
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+  sortA: () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const products = await db
+          .get()
+          .collection(collection.PRODUCT_COLLECTION)
+          .find()
+          .sort({ _id: -1 })
+          .sort({ price: 1 })
+          .toArray();
+        resolve(products);
+
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+ 
  
   getUser: (userId) => {
     return new Promise((resolve, reject) => {
