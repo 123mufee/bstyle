@@ -273,6 +273,7 @@ router.get("/add-product", (req, res, next) => {
 router.post("/add-product", async (req, res, next) => {
   try {
     const id = uniqid();
+    console.log("nnnnnnnnnnnnnnnnnn",id);
     console.log("image" + req.body.image+id);
     req.body.image = id + ".jpg";
     await productHelper.addProduct(req.body);

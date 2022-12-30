@@ -206,6 +206,31 @@ router.get("/view-product", async function (req, res, next) {
     let userData = req.session.user;
     let cartCount = null;
   
+    productHelper.getAllProduct(req.session.user._id).then(async(product) => {
+      // console.log(product); 
+       if (req.session.user) {
+      cartCount = await userHelper.getCartCount(req.session.user._id);
+
+    }
+    let wishCount = null;
+    if (req.session.user) {
+      wishCount = await userHelper.getWishCount(req.session.user._id);
+    
+    }
+      // console.log("lloll");
+      res.render("user/view-product", {product, user: true,userData,cartCount,wishCount}
+      )
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/page2', async function (req, res, next) {
+  try {
+    let userData = req.session.user;
+    let cartCount = null;
+  
     productHelper.getAllProduct().then(async(product) => {
       console.log(product); 
        if (req.session.user) {
@@ -216,18 +241,13 @@ router.get("/view-product", async function (req, res, next) {
       wishCount = await userHelper.getWishCount(req.session.user._id);
     }
       console.log("lloll");
-      res.render("user/view-product", {
-        product,
-        user: true,
-        userData,
-        cartCount,
-        wishCount,
-      });
+      res.render("user/view-products2", {product, user: true,userData,cartCount,wishCount}
+      )
     });
   } catch (error) {
     next(error);
   }
-});
+}),
 
 router.get("/user/sortD", async function (req, res, next) {
   console.log('ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp');
@@ -287,32 +307,39 @@ router.get("/user/sortA", async function (req, res, next) {
   }
 });
 //user profile
-router.get("/profile/:id",middleware.userAuth, async (req, res, next) => {
-  try {
-    const userData = await userHelper.getUserDetails(req.params.id);
-    const photo = await userHelper.imageupload(req.session.user._id)
-    console.log(photo);
-    res.render("user/profile", { userData, user: true, 
-      photo 
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-router.post("/userDataupload/:email",async(req,res,next)=>{
-  console.log("-----------------------------------------------------req.params.email");
-  try{
-   await userHelper.userprofile(req.params.email,req.body).then(()=>{
-    res.redirect('back')
-  })
+// router.get("/profile/:id",middleware.userAuth, async (req, res, next) => {
+//   try {
+//     const userData = await userHelper.getUserDetails(req.params.id);
+//     const photo = await userHelper.imageupload(req.session.user._id)
+//     console.log('test=',photo);
+//     res.render("user/profile", { userData, user: true, 
+//       photo 
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+
+router.get('/profile/:id', middleware.userAuth, userHelper.userProfile)
+router.route('/editProfile')
+      .get(userHelper.editProfilePage)
+      .post(userHelper.editProfile)   
+// router.post("/userDataupload/:email",async(req,res,next)=>{
+//   console.log("-----------------------------------------------------req.params.email");
+//   try{
+//    await userHelper.userprofile(req.params.email,req.body).then(()=>{
+//     res.redirect('back')
+//   })
   
-  }catch(error){
-    next(error)
-    console.log('catch---------------------');
+//   }catch(error){
+//     next(error)
+//     console.log('catch---------------------');
 
-  }
+//   }
 
-});
+// });
+// router.get('/profile',userHelper.userProfile)
+router.post('/profile-pic',userHelper.profilePic)
 
 router.get("/productpage/:id", (req,res) => {
   
@@ -615,20 +642,29 @@ router.get("/wishlist",middleware.userAuth, async (req, res, next) => {
 
 router.get("/add-to-wishlist/:id", (req, res, next) => {
   try {
-    userHelper.addToWishlist(req.params.id, req.session.user._id).then(() => {
-      res.json({ status: true });
+    userHelper.addToWishlist(req.params.id, req.session.user._id).then((response) => {
+      console.log(response);
+      if (response == 'exist') {
+        console.log("e");
+        res.json({ status: false });
+      } else {
+        console.log("not");
+        res.json({ status: true });
+      }
+        
+      
     });
   } catch (error) {
     next(error);
   }
 });
 
-router.get("/deleteWishProduct/:id/:pId", (req, res, next) => {
+router.get("/deleteWishProduct/:id/:proId", (req, res, next) => {
   try {
-    let wId = req.params.id;
-    let proId = req.params.pId;
-    userHelper.deleteWishProduct(wId, proId).then((response) => {
-      res.redirect("/wishlist");
+    let proId = req.params.proId;
+    let userId = req.params.id
+    userHelper.deleteWishProduct(proId,userId).then(() => {
+      res.redirect('/wishlist')
     });
   } catch (error) {
     next(error);

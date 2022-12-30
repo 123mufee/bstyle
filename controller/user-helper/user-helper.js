@@ -8,11 +8,17 @@ const Razorpay = require("razorpay");
 const { resolve } = require("path");
 const { v4: uuidv4 } = require("uuid");
 const { log } = require("console");
+const uniqid = require("uniqid");
+
+const profilepic=require("../../helpers/profilepic")
+const editprofile=require("../../helpers/editprofile")
+
 var instance = new Razorpay({
   key_id: "rzp_test_2QPRJfwv1TIYjS",
   key_secret: "ibu7PoN3iGLy3zGCa3RDWOXC",
 });
-const nodemailer = require("nodemailer")
+const nodemailer = require("nodemailer");
+const { ObjectId } = require("mongodb");
 
 let transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
@@ -201,21 +207,100 @@ settingpassword: async (req, res) => {
 //forgot password end
 
 
-  userprofile:(useremail,userbody)=>{
-    console.log("bbbb")
-    return new Promise(async(resolve,reject)=>{
-      db.get()
-        .collection(collection.USER_COLLECTION)
-        .updateOne({email:useremail},{$set:{
-          userdatails:userbody
-        }
+  // userprofile:(useremail,userbody)=>{
+  //   console.log("bbbb")
+  //   return new Promise(async(resolve,reject)=>{
+  //     db.get()
+  //       .collection(collection.PROFILE_COLLECTION)
+  //       .updateOne({email:useremail},{$set:{
+  //         userdatails:userbody
+  //       }
 
-      },
-      {upsert:true}
-      )
-      resolve()
-    })
-  },
+  //     },
+  //     {upsert:true}
+  //     )
+  //     resolve()
+  //   })
+  // },
+  userProfile:async(req,res)=>{
+    let userId=req.session.user._id
+    console.log(userId);
+    let profilePic
+   
+    const userDetails = await db
+    .get()
+    .collection(collection.USER_COLLECTION)
+    .findOne({ _id:ObjectId(userId )});
+    
+    const profile = await db
+    .get()
+    .collection(collection.PROFILE_COLLECTION)
+    .findOne({ user:userId});
+
+console.log(userDetails,"mmmmmmmmmmmmmmmmmmmmmm",profile,"VVVVVVVVVVVVVVVVVVVVVVV");
+
+
+    if(!profile){
+      profilePic=null
+      //  await db
+      // .get()
+      // .collection(collection.PROFILE_COLLECTION)
+      // .insertOne({ user:ObjectId(userId), profilePic:imageUrl});
+        
+    }else{
+        profilePic=profile.imageUrl.imageurl
+       
+    }
+    res.render('user/profile-page',{userDetails,profilePic})
+},
+editProfilePage:async(req,res)=>{
+let userId = req.session.userId
+const userDetails = await db
+    .get()
+    .collection(collection.USER_COLLECTION)
+    .findOne({ _id:userId});
+res.render('user/edit-profile',{userDetails,err:false,success:false})
+},
+editProfile:(req,res)=>{
+let data = req.body
+let userId=req.session.userId
+editprofile.editUser(data,userId).then(()=>{
+    res.redirect('/edit-Profile')
+})
+},
+profilePic:async(req,res)=>{
+  console.log("iiijiiiii");
+
+
+
+  
+    const id = uniqid();
+    const userId= req.session.user._id;
+  
+    req.body.image = id + ".jpg";
+    console.log('oooooo');
+    console.log(req.body.image);
+    // const response = await categoryHelpers.addCategory(req.body);
+    // console.log("check one", response);
+    let image = req.files.image;
+    image.imageurl = req.body.image
+    console.log(image);
+    image.mv("./public/product-images/" + id + ".jpg", (err, done) => {
+      if (!err) {
+        
+  profilepic.profilePicChange(image,userId).then(()=>{
+    res.redirect('/')
+})
+      } else {
+        console.log(err);
+      }
+    });
+
+  
+
+
+
+},
   productpage: (productimage) => {
     return new Promise(async(resolve, reject) => {
      try {
@@ -235,10 +320,11 @@ settingpassword: async (req, res) => {
   
   pictureupload:(imagefiles,user)=>{
     return new Promise (async(resolve,reject)=>{
-      imagefiles.user=user
+      let user= imagefiles.image
+      console.log(user);
       db.get()
       .collection( collection.PROFILE_COLLECTION)
-      .insertOne(imagefiles).then(()=>{
+      .insertOne(user).then(()=>{
        resolve();
      
       })
@@ -265,7 +351,7 @@ settingpassword: async (req, res) => {
     return new Promise((resolve, reject) => {
      try {
        db.get()
-         .collection(collection.USER_COLLECTION)
+         .collection(collection.PROFILE_COLLECTION)
          .findOne({ _id: objectId(userId) })
          .then((user) => {
            resolve(user);
@@ -300,6 +386,12 @@ settingpassword: async (req, res) => {
      }
     });
   },
+  // products:async(req,res)=>{
+  //   let page=req.query.page;
+  //   let product_limit=4;
+  //   let total_product;
+  //   let logged = req.session.loginstatus;
+  // },
   addToCart: (proId, userId) => {
     let proObj = {
       item: objectId(proId),
@@ -780,7 +872,8 @@ settingpassword: async (req, res) => {
     let proObj = {
       item: objectId(proId),
       quantity: 1,
-      flag: false
+      flag: false,
+      
     };
     return new Promise(async (resolve, reject) => {
       try {
@@ -802,7 +895,20 @@ settingpassword: async (req, res) => {
                     products: { item: objectId(proId) },
                   },
                 }
-              );
+              )
+              db.get()
+              .collection(collection.PRODUCT_COLLECTION)
+              .updateOne(
+                { _id: objectId(proId)  },
+                {
+                  $set: { fav: false },
+                }
+              )
+              .then((response) => {
+                let exist = 'exist'
+                resolve(exist);
+              });
+              
           } else {
             db.get()
               .collection(collection.WISHLIST_COLLECTION)
@@ -812,8 +918,17 @@ settingpassword: async (req, res) => {
                   $push: { products: proObj },
                 }
               )
+              db.get()
+            .collection(collection.PRODUCT_COLLECTION)
+            .updateOne(
+              { _id: objectId(proId)  },
+              {
+                $set: { fav: true },
+              }
+            )
               .then((response) => {
-                resolve();
+                let notExist = 'notExist'
+                resolve(notExist);
               });
           }
         } else {
@@ -867,6 +982,8 @@ settingpassword: async (req, res) => {
             },
           ])
           .toArray();
+
+          
   
         if (wishItems.length == 0) {
           resolve(wishItems);
@@ -895,21 +1012,35 @@ settingpassword: async (req, res) => {
       }
     });
   },
-  deleteWishProduct: (wId, proId) => {
+  deleteWishProduct: (proId,userId) => {
+    console.log(userId,"fffffffffff");
+    let proObj = {
+    
+    };
     return new Promise((resolve, reject) => {
      try {
        db.get()
          .collection(collection.WISHLIST_COLLECTION)
          .updateOne(
-           { _id: objectId(wId) },
+           { _id: objectId(userId) },
            {
              $pull: {
                products: { item: objectId(proId) },
              },
            }
+
          )
-         .then((response) => {
-           resolve(response);
+         db.get()
+         .collection(collection.PRODUCT_COLLECTION)
+         .updateOne(
+           { _id: objectId(proId)  },
+           {
+             $set: { fav: false },
+           }
+         )
+         .then(() => {
+          console.log("sssssssssssss");
+           resolve();
          });
      } catch (error) {
       reject(error);

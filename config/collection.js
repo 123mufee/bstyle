@@ -9,5 +9,5 @@ module.exports = {
   COUPON_COLLECTION:'coupon',
   BANNER_COLLECTION:'banner',
   MESSAGE_COLLECTION:'message',
-  PROFILE_COLLECTION:'photo'
+  PROFILE_COLLECTION:'profilePic'
 };

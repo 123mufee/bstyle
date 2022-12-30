@@ -20,16 +20,32 @@ module.exports = {
       }
     });
   },
-  getAllProduct: () => {
+  getAllProduct: (user_id) => {
     return new Promise(async (resolve, reject) => {
       try {
+        console.log(user_id,'user_id');
         const products = await db
           .get()
           .collection(collection.PRODUCT_COLLECTION)
           .find()
-          // .sort({ _id: -1 })
-          // .sort({ price: -1 })
           .toArray();
+          const wishlist = await db
+          .get()
+          .collection(collection.WISHLIST_COLLECTION)
+          .findOne({user:objectId(user_id)})
+
+          console.log(wishlist,"===============");
+          
+
+          for (let i = 0; i < products.length; i++) {
+            for (let j = 0; j < wishlist.products.length; j++) {
+                if (wishlist.products[j].item == products[i]._id) {
+                  console.log("true");
+                    products[i].fav = true;
+                }
+            }
+        }
+        // console.log(products,'sdfas');
         resolve(products);
       } catch (error) {
         reject(error);
